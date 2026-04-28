@@ -35,6 +35,12 @@ public class OpenAiModelProvider extends AbsModelProvider {
             new ModelInfo("gpt-4o-mini", "GPT-4 Omni Mini", ModelType.LLM),
             new ModelInfo("gpt-4-turbo", "GPT-4 Turbo", ModelType.LLM),
             new ModelInfo("gpt-4-turbo-preview", "GPT-4 Turbo Preview", ModelType.LLM),
+            // 亚信AI网关模型
+            new ModelInfo("aliyun/qwen3.6-plus", "Qwen-plus 3.6", ModelType.LLM),
+            new ModelInfo("aliyun/deepseek-v3.2", "DeepSeek V3.2", ModelType.LLM),
+            new ModelInfo("aliyun/kimi-k2.5", "Kimi K2.5", ModelType.LLM),
+            new ModelInfo("aliyun/glm-5", "GLM-5", ModelType.LLM),
+            new ModelInfo("aliyun/MiniMax-M2.5", "MiniMax M2.5", ModelType.LLM),
             new ModelInfo("text-embedding-ada-002", "Text Embedding Ada v2", ModelType.EMBEDDING),
             new ModelInfo("whisper-1", "Whisper Speech-to-Text", ModelType.STT),
             new ModelInfo("tts-1", "Text-to-Speech", ModelType.TTS),

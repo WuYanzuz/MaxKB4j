@@ -2,7 +2,9 @@ package com.maxkb4j.model.provider;
 
 import com.alibaba.fastjson.JSONObject;
 import com.maxkb4j.common.domain.form.BaseField;
+import com.maxkb4j.common.domain.form.TextInputField;
 import com.maxkb4j.common.mp.entity.ModelCredential;
+import com.maxkb4j.model.custom.credential.ModelCredentialForm;
 import com.maxkb4j.model.custom.model.BaiLianImageModel;
 import com.maxkb4j.model.custom.model.BaiLianReranker;
 import com.maxkb4j.model.custom.model.BaiLianSTTModel;
@@ -19,6 +21,7 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.image.ImageModel;
 import dev.langchain4j.model.scoring.ScoringModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,6 +60,20 @@ public class AliYunBaiLianModelProvider extends AbsModelProvider {
         return new QWenChatModelParams().toForm();
     }
 
+    @Override
+    public ModelCredentialForm getModelCredential() {
+        // 显示 baseUrl 输入框，但非必填（有默认值）
+        return new ModelCredentialForm(true, true) {
+            @Override
+            public List<BaseField> toForm() {
+                List<BaseField> list = new ArrayList<>(2);
+                // baseUrl 非必填，有默认提示
+                list.add(new TextInputField("API 域名（可选）", "baseUrl", false, "https://dashscope.aliyuncs.com/compatible-mode/v1"));
+                list.add(new TextInputField("API KEY", "apiKey", true));
+                return list;
+            }
+        };
+    }
 
     @Override
     public List<ModelInfo> getModelList() {
@@ -65,33 +82,42 @@ public class AliYunBaiLianModelProvider extends AbsModelProvider {
 
     @Override
     public ChatModel buildChatModel(String modelName, ModelCredential credential, JSONObject params) {
-        return QwenChatModel.builder()
+        var builder = QwenChatModel.builder()
                 .apiKey(credential.getApiKey())
                 .modelName(modelName)
                 .temperature(getFloatParam(params, "temperature"))
                 .maxTokens(getIntParam(params, "maxTokens"))
-                .isMultimodalModel(getBooleanParam(params, "isMultimodalModel"))
-                .build();
+                .isMultimodalModel(getBooleanParam(params, "isMultimodalModel"));
+        if (credential.getBaseUrl() != null && !credential.getBaseUrl().isEmpty()) {
+            builder.baseUrl(credential.getBaseUrl());
+        }
+        return builder.build();
     }
 
     @Override
     public StreamingChatModel buildStreamingChatModel(String modelName, ModelCredential credential, JSONObject params) {
-        return QwenStreamingChatModel.builder()
+        var builder = QwenStreamingChatModel.builder()
                 .apiKey(credential.getApiKey())
                 .modelName(modelName)
                 .temperature(getFloatParam(params, "temperature"))
                 .maxTokens(getIntParam(params, "maxTokens"))
-                .isMultimodalModel(getBooleanParam(params, "isMultimodalModel"))
-                .build();
+                .isMultimodalModel(getBooleanParam(params, "isMultimodalModel"));
+        if (credential.getBaseUrl() != null && !credential.getBaseUrl().isEmpty()) {
+            builder.baseUrl(credential.getBaseUrl());
+        }
+        return builder.build();
     }
 
     @Override
     public EmbeddingModel buildEmbeddingModel(String modelName, ModelCredential credential, JSONObject params) {
-        return QwenEmbeddingModel.builder()
+        var builder = QwenEmbeddingModel.builder()
                 .apiKey(credential.getApiKey())
                 .modelName(modelName)
-                .dimension(getIntParam(params, "dimension"))
-                .build();
+                .dimension(getIntParam(params, "dimension"));
+        if (credential.getBaseUrl() != null && !credential.getBaseUrl().isEmpty()) {
+            builder.baseUrl(credential.getBaseUrl());
+        }
+        return builder.build();
     }
 
     @Override

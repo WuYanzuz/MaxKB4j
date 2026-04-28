@@ -12,7 +12,14 @@
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
+
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>com.tarzan</groupId>
             <artifactId>maxkb4j-application</artifactId>

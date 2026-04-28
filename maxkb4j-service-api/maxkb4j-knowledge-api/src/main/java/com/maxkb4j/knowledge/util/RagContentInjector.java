@@ -65,7 +65,10 @@ public class RagContentInjector {
     private String formatParagraph(ParagraphVO paragraph) {
         String title = paragraph.getTitle();
         String content = paragraph.getContent();
-        return title.isEmpty() ? content : String.format("content: %s\n%s", title, content);
+        String documentName = paragraph.getDocumentName();
+        String docPrefix = (documentName != null && !documentName.isEmpty()) ? String.format("[来源文档：%s]\n", documentName) : "";
+
+        return docPrefix + (title.isEmpty() ? content : String.format("content: %s\n%s", title, content));
     }
 
 }

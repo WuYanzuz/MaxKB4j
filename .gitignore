@@ -28,6 +28,10 @@ hs_err_pid*
 
 /.claude
 /.idea
+/.qoder
+/.vscode
+/mongo
+/postgres
 /ui/src/assets/
 /ui/
 

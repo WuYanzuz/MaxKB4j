@@ -3,6 +3,8 @@ services:
     image: registry.cn-hangzhou.aliyuncs.com/tarzanx/pgvector:0.7.0-pg15
     container_name: maxkb4j-pgvector
     restart: always
+    ports:
+      - "5433:5432"
     networks:
       - maxkb4j_network
     environment:
@@ -15,6 +17,8 @@ services:
     image: registry.cn-hangzhou.aliyuncs.com/tarzanx/mongo:8.0
     container_name: maxkb4j-mongo
     restart: always
+    ports:
+      - "27017:27017"
     networks:
       - maxkb4j_network
     environment:
