@@ -1,3 +1,5 @@
+name: maxkb4j-prod
+
 services:
   postgres:
     image: registry.cn-hangzhou.aliyuncs.com/tarzanx/pgvector:0.7.0-pg15
@@ -40,9 +42,6 @@ services:
 
   maxkb4j:
     container_name: maxkb4j-app
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: maxkb4j:latest
     ports:
       - "8080:8080"
@@ -59,15 +58,13 @@ services:
         max-size: "30m"
         max-file: "3"
     environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://tarzan_mongo:ycn4NRhjN2@mongo:27017/MaxKB4j?authSource=admin
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/MaxKB4j
-      - SPRING_DATASOURCE_USERNAME=tarzan_postgres
-      - SPRING_DATASOURCE_PASSWORD=ycn4NRhjN2
+      - SPRING_PROFILES_ACTIVE=prod
     volumes:
       - ./logs:/logs
+      - ./config:/opt/running/config
       - ./server.crt:/tmp/certs/server.crt
       # 如需使用文档目录监控功能，取消下面注释并修改路径
-      # - E:/docs/watch:/app/docs/watch:ro
+      # - E:/docs/watch
 
 networks:
   maxkb4j_network:

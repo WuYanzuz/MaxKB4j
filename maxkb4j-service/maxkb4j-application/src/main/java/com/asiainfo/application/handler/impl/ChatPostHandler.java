@@ -1,0 +1,125 @@
+package com.asiainfo.application.handler.impl;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.asiainfo.application.entity.ApplicationChatEntity;
+import com.asiainfo.application.entity.ApplicationChatRecordEntity;
+import com.asiainfo.application.entity.ApplicationChatUserStatsEntity;
+import com.asiainfo.application.handler.PostResponseHandler;
+import com.asiainfo.application.mapper.ApplicationChatMapper;
+import com.asiainfo.application.mapper.ApplicationChatRecordMapper;
+import com.asiainfo.application.service.ApplicationChatUserStatsService;
+import com.asiainfo.common.cache.ChatCache;
+import com.asiainfo.common.domain.dto.ChatInfo;
+import com.asiainfo.common.domain.dto.ChatParams;
+import com.asiainfo.common.domain.dto.ChatRecordDTO;
+import com.asiainfo.common.domain.dto.ChatResponse;
+import com.asiainfo.common.enums.ChatSource;
+import com.asiainfo.common.enums.ChatUserType;
+import com.asiainfo.common.util.BeanUtil;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+
+@RequiredArgsConstructor
+@Component
+public class ChatPostHandler implements PostResponseHandler {
+
+    private final ApplicationChatUserStatsService chatUserStatsService;
+    private final ApplicationChatMapper chatMapper;
+    private final ApplicationChatRecordMapper chatRecordMapper;
+
+    @Override
+    public void handler(ChatParams chatParams, ChatResponse chatResponse, long startTime) {
+        String chatId = chatParams.getChatId();
+        String chatRecordId = chatParams.getChatRecordId();
+        String problemText = chatParams.getMessage();
+        String chatUserId = chatParams.getChatUserId();
+        String chatUserType = chatParams.getChatUserType();
+        boolean debug = chatParams.getDebug();
+        float runTime = (System.currentTimeMillis() - startTime) / 1000F;
+        ChatInfo chatInfo = ChatCache.get(chatId);
+        String answerText = chatResponse.getAnswer();
+        JSONArray answerTextList=chatResponse.getAnswerJSONArray();
+        int messageTokens = chatResponse.getMessageTokens();
+        int answerTokens = chatResponse.getAnswerTokens();
+        JSONObject details = chatResponse.getRunDetails();
+        ChatRecordDTO chatRecord=chatParams.getChatRecord();
+        ApplicationChatRecordEntity chatRecordEntity = new ApplicationChatRecordEntity();
+        chatRecordEntity.setId(chatRecordId);
+        chatRecordEntity.setChatId(chatId);
+        chatRecordEntity.setProblemText(problemText);
+        if (chatRecord != null) {
+            chatRecordEntity.setAnswerText(answerText);
+            chatRecordEntity.setAnswerTextList(answerTextList);
+            chatRecordEntity.setIndex(chatRecord.getIndex());
+            chatRecordEntity.setMessageTokens(messageTokens);
+            chatRecordEntity.setAnswerTokens(answerTokens);
+            chatRecordEntity.setCost(messageTokens + answerTokens);
+            chatRecordEntity.setRunTime(runTime + chatRecord.getRunTime());
+            chatRecordEntity.setVoteStatus(chatRecord.getVoteStatus());
+        } else {
+            chatRecordEntity.setAnswerText(answerText);
+            chatRecordEntity.setAnswerTextList(answerTextList);
+            if (chatInfo!=null){
+                chatRecordEntity.setIndex(chatInfo.getChatRecordList().size() + 1);
+            }else {
+                chatRecordEntity.setIndex(0);
+            }
+            chatRecordEntity.setMessageTokens(messageTokens);
+            chatRecordEntity.setAnswerTokens(answerTokens);
+            chatRecordEntity.setRunTime(runTime);
+            chatRecordEntity.setVoteStatus("-1");
+            chatRecordEntity.setCost(messageTokens + answerTokens);
+        }
+        chatRecordEntity.setDetails(details);
+        chatRecordEntity.setImproveParagraphIdList(List.of());
+        ChatRecordDTO chatRecordDTO=BeanUtil.copy(chatRecordEntity, ChatRecordDTO.class);
+        if (chatInfo==null){
+            chatInfo = new ChatInfo(chatId, chatParams.getAppId());
+        }
+        chatInfo.addChatRecord(chatRecordDTO);
+        // 重新设置缓存
+        ChatCache.put(chatId, chatInfo);
+        if (!debug) {
+            ApplicationChatUserStatsEntity chatUserStats = chatUserStatsService.getByUserIdAndAppId(chatUserId, chatInfo.getAppId());
+            if (chatUserStats != null) {
+                chatUserStats.setAccessNum(chatUserStats.getAccessNum() + 1);
+                chatUserStats.setIntraDayAccessNum(chatUserStats.getIntraDayAccessNum() + 1);
+                chatUserStatsService.updateById(chatUserStats);
+            }
+            long chatCount = chatMapper.selectCount(Wrappers.<ApplicationChatEntity>lambdaQuery().eq(ApplicationChatEntity::getId, chatId));
+            ApplicationChatEntity chatEntity = new ApplicationChatEntity();
+            chatEntity.setId(chatId);
+            if (chatCount == 0) {
+                chatEntity.setApplicationId(chatInfo.getAppId());
+                String problemOverview = problemText.length() > 50 ? problemText.substring(0, 50) : problemText;
+                chatEntity.setSummary(problemOverview);
+                chatEntity.setChatUserId(chatUserId);
+                chatEntity.setChatUserType(StringUtils.isBlank(chatUserType) ? ChatUserType.CHAT_USER.name() : chatUserType);
+                chatEntity.setIsDeleted(false);
+                chatEntity.setAsker(new JSONObject(Map.of("username", "游客")));
+                chatEntity.setMeta(new JSONObject());
+                chatEntity.setStarNum(0);
+                chatEntity.setTrampleNum(0);
+                chatEntity.setChatRecordCount(1);
+                chatEntity.setMarkSum(0);
+                chatEntity.setIpAddress(chatParams.getIpAddress());
+                ChatSource source=chatParams.getSource()==null?ChatSource.ONLINE:chatParams.getSource();
+                chatEntity.setSource(new JSONObject(Map.of("type", source)));
+                chatMapper.insert(chatEntity);
+            }else {
+                chatEntity.setChatRecordCount(chatInfo.getChatRecordList().size());
+                chatMapper.updateById(chatEntity);
+            }
+            chatRecordMapper.insertOrUpdate(chatRecordEntity);
+        }
+    }
+
+
+}
+

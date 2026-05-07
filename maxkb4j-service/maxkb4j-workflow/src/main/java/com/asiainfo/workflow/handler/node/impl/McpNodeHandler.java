@@ -1,0 +1,50 @@
+package com.asiainfo.workflow.handler.node.impl;
+
+import com.alibaba.fastjson.JSONObject;
+import com.asiainfo.application.executor.McpClientExecutor;
+import com.asiainfo.workflow.annotation.NodeHandlerType;
+import com.asiainfo.workflow.enums.NodeType;
+import com.asiainfo.workflow.handler.node.AbsNodeHandler;
+import com.asiainfo.workflow.model.NodeResult;
+import com.asiainfo.workflow.model.Workflow;
+import com.asiainfo.workflow.node.AbsNode;
+import com.asiainfo.workflow.node.impl.McpNode;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+
+@Slf4j
+@NodeHandlerType(NodeType.MCP)
+@RequiredArgsConstructor
+@Component
+public class McpNodeHandler extends AbsNodeHandler {
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected NodeResult doExecute(Workflow workflow, AbsNode node) throws Exception {
+        McpNode.NodeParams params = parseParams(node, McpNode.NodeParams.class);
+        JSONObject toolParams = params.getToolParams();
+        JSONObject execParams = new JSONObject();
+
+        for (String key : toolParams.keySet()) {
+            Object value = toolParams.get(key);
+            if (value instanceof List) {
+                List<String> fields = (List<String>) value;
+                value = workflow.getReferenceField(fields);
+            }
+            execParams.put(key, value);
+        }
+
+        String resultText = new McpClientExecutor(params.getMcpServers()).execute(params.getMcpTool(), execParams);
+
+        putDetails(node, Map.of(
+                "toolParams", toolParams,
+                "mcpTool", params.getMcpTool()
+        ));
+
+        return new NodeResult(Map.of("result", resultText));
+    }
+}

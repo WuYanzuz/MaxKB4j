@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.tarzan</groupId>
+        <groupId>com.asiainfo</groupId>
         <artifactId>MaxKB4j</artifactId>
         <version>${revision}</version>
     </parent>
@@ -23,7 +23,7 @@
             <version>${jetbrains.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-common</artifactId>
             <version>${revision}</version>
         </dependency>

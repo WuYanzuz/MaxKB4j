@@ -1,115 +1,96 @@
-<?xml version="1.0" encoding="GBK"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
-    <!-- 日志存放路径 -->
+    <!-- 鏃ュ織瀛樺偍璺緞 -->
     <property name="log.path" value="logs/maxkb4j"/>
-    <!-- 项目名称 -->
+    <!-- 椤圭洰鍚嶇О -->
     <property name="log.appname" value="maxkb4j"/>
-    <!-- 日志输出格式 -->
+    <!-- 鏃ュ織杈撳嚭鏍煎紡锛堟枃浠讹級 -->
     <property name="log.pattern" value="%n%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] [%logger{50}] %n%-5level: %msg%n"/>
-    <!-- 彩色日志格式 -->
+    <!-- 褰╄壊鏃ュ織鏍煎紡锛堟帶鍒跺彴锛� -->
     <conversionRule conversionWord="clr" class="org.springframework.boot.logging.logback.ColorConverter"/>
     <conversionRule conversionWord="wex" class="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
-    <property name="log.pattern.console" value="${log.pattern}"/>
     <property name="log.pattern.color" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%-5level){highlight}%clr([${PID:- }]){magenta} %clr([%thread]){blue} %clr(%logger{50}){cyan} : %msg%n"/>
 
-    <!-- 控制台彩色输出 -->
-    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>${log.pattern.color}</pattern>
-            <charset>GBK</charset>
-        </encoder>
-    </appender>
-
-    <!-- 系统日志输出 -->
-    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/info-%d{yyyyMMdd}-%i.log</fileNamePattern>
-            <maxFileSize>100MB</maxFileSize>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>5GB</totalSizeCap>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${log.pattern}</pattern>
-            <charset>GBK</charset>
-        </encoder>
-        <!-- 使用 ThresholdFilter 让 INFO 及以上级别都通过 -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
-        <!-- 但排除 WARN 和 ERROR，它们有专门的文件 -->
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
-                <marker>EXCLUDE_FROM_INFO</marker>
-            </evaluator>
-            <onMatch>DENY</onMatch>
-            <onMismatch>NEUTRAL</onMismatch>
-        </filter>
-    </appender>
-
-    <!-- 警告日志输出 -->
-    <appender name="file_warn" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/warn-%d{yyyyMMdd}-%i.log</fileNamePattern>
-            <maxFileSize>100MB</maxFileSize>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>3GB</totalSizeCap>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${log.pattern}</pattern>
-            <charset>GBK</charset>
-        </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>WARN</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-    </appender>
-
-    <!-- 错误日志输出 -->
-    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/error-%d{yyyyMMdd}-%i.log</fileNamePattern>
-            <maxFileSize>100MB</maxFileSize>
-            <maxHistory>60</maxHistory>
-            <totalSizeCap>5GB</totalSizeCap>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${log.pattern}</pattern>
-            <charset></charset>
-        </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ERROR</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-    </appender>
-
-    <!-- 异步日志输出 - INFO -->
-    <appender name="async_info" class="ch.qos.logback.classic.AsyncAppender">
-        <discardingThreshold>0</discardingThreshold>
-        <queueSize>512</queueSize>
-        <includeCallerData>true</includeCallerData>
-        <appender-ref ref="file_info"/>
-    </appender>
-
-    <!-- 异步日志输出 - WARN -->
-    <appender name="async_warn" class="ch.qos.logback.classic.AsyncAppender">
-        <discardingThreshold>0</discardingThreshold>
-        <queueSize>256</queueSize>
-        <includeCallerData>true</includeCallerData>
-        <appender-ref ref="file_warn"/>
-    </appender>
-
-    <!-- 异步日志输出 - ERROR -->
-    <appender name="async_error" class="ch.qos.logback.classic.AsyncAppender">
-        <discardingThreshold>0</discardingThreshold>
-        <queueSize>256</queueSize>
-        <includeCallerData>true</includeCallerData>
-        <appender-ref ref="file_error"/>
-    </appender>
-
-    <!-- 开发环境日志配置 -->
+    <!-- ==================== dev 鐜锛圙BK锛岄�傞厤 Windows 缁堢锛� ==================== -->
     <springProfile name="dev">
+        <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${log.pattern.color}</pattern>
+                <charset>GBK</charset>
+            </encoder>
+        </appender>
+
+        <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${log.path}/info-%d{yyyyMMdd}-%i.log</fileNamePattern>
+                <maxFileSize>100MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>5GB</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>${log.pattern}</pattern>
+                <charset>GBK</charset>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level>
+            </filter>
+        </appender>
+
+        <appender name="file_warn" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${log.path}/warn-%d{yyyyMMdd}-%i.log</fileNamePattern>
+                <maxFileSize>100MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>3GB</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>${log.pattern}</pattern>
+                <charset>GBK</charset>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>WARN</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+        </appender>
+
+        <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${log.path}/error-%d{yyyyMMdd}-%i.log</fileNamePattern>
+                <maxFileSize>100MB</maxFileSize>
+                <maxHistory>60</maxHistory>
+                <totalSizeCap>5GB</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>${log.pattern}</pattern>
+                <charset>GBK</charset>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+        </appender>
+
+        <appender name="async_info" class="ch.qos.logback.classic.AsyncAppender">
+            <discardingThreshold>0</discardingThreshold>
+            <queueSize>512</queueSize>
+            <includeCallerData>true</includeCallerData>
+            <appender-ref ref="file_info"/>
+        </appender>
+        <appender name="async_warn" class="ch.qos.logback.classic.AsyncAppender">
+            <discardingThreshold>0</discardingThreshold>
+            <queueSize>256</queueSize>
+            <includeCallerData>true</includeCallerData>
+            <appender-ref ref="file_warn"/>
+        </appender>
+        <appender name="async_error" class="ch.qos.logback.classic.AsyncAppender">
+            <discardingThreshold>0</discardingThreshold>
+            <queueSize>256</queueSize>
+            <includeCallerData>true</includeCallerData>
+            <appender-ref ref="file_error"/>
+        </appender>
+
         <root level="INFO">
             <appender-ref ref="console"/>
             <appender-ref ref="async_info"/>
@@ -118,8 +99,86 @@
         </root>
     </springProfile>
 
-    <!-- 生产环境日志配置 - 也输出控制台方便容器环境 -->
+    <!-- ==================== prod 鐜锛圲TF-8锛岄�傞厤 Linux 缁堢锛� ==================== -->
     <springProfile name="prod">
+        <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${log.pattern.color}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+
+        <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${log.path}/info-%d{yyyyMMdd}-%i.log</fileNamePattern>
+                <maxFileSize>100MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>5GB</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>${log.pattern}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level>
+            </filter>
+        </appender>
+
+        <appender name="file_warn" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${log.path}/warn-%d{yyyyMMdd}-%i.log</fileNamePattern>
+                <maxFileSize>100MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>3GB</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>${log.pattern}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>WARN</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+        </appender>
+
+        <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${log.path}/error-%d{yyyyMMdd}-%i.log</fileNamePattern>
+                <maxFileSize>100MB</maxFileSize>
+                <maxHistory>60</maxHistory>
+                <totalSizeCap>5GB</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>${log.pattern}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+        </appender>
+
+        <appender name="async_info" class="ch.qos.logback.classic.AsyncAppender">
+            <discardingThreshold>0</discardingThreshold>
+            <queueSize>512</queueSize>
+            <includeCallerData>true</includeCallerData>
+            <appender-ref ref="file_info"/>
+        </appender>
+        <appender name="async_warn" class="ch.qos.logback.classic.AsyncAppender">
+            <discardingThreshold>0</discardingThreshold>
+            <queueSize>256</queueSize>
+            <includeCallerData>true</includeCallerData>
+            <appender-ref ref="file_warn"/>
+        </appender>
+        <appender name="async_error" class="ch.qos.logback.classic.AsyncAppender">
+            <discardingThreshold>0</discardingThreshold>
+            <queueSize>256</queueSize>
+            <includeCallerData>true</includeCallerData>
+            <appender-ref ref="file_error"/>
+        </appender>
+
         <root level="INFO">
             <appender-ref ref="console"/>
             <appender-ref ref="async_info"/>
@@ -128,30 +187,13 @@
         </root>
     </springProfile>
 
-    <!-- 默认配置（无 profile 时生效） -->
-    <springProfile name="!dev &amp; !prod">
-        <root level="INFO">
-            <appender-ref ref="console"/>
-            <appender-ref ref="async_info"/>
-            <appender-ref ref="async_warn"/>
-            <appender-ref ref="async_error"/>
-        </root>
-    </springProfile>
-
-    <!-- 系统模块日志级别控制 -->
-    <logger name="com.maxkb4j" level="info"/>
-    <!-- Spring 日志级别控制 -->
+    <!-- 鍚勬ā鍧楁棩蹇楃骇鍒� -->
+    <logger name="com.asiainfo" level="info"/>
     <logger name="org.springframework" level="warn"/>
-    <!-- MyBatis SQL 日志 -->
     <logger name="org.mybatis" level="info"/>
-    <!-- HikariCP 连接池日志 -->
     <logger name="com.zaxxer.hikari" level="warn"/>
-    <!-- Apache Commons 日志 -->
     <logger name="org.apache" level="warn"/>
-    <!-- LangChain4j 日志 -->
     <logger name="dev.langchain4j" level="warn"/>
-    <!-- Logback 自身日志 -->
     <logger name="ch.qos.logback" level="error"/>
-    <!-- MongoDB 日志 -->
     <logger name="org.mongodb" level="warn"/>
 </configuration>

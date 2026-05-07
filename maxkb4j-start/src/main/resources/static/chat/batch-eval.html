@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>批量评测 - MaxKB4j</title>
+  <link rel="icon" href="./favicon.ico"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      padding: 36px 40px;
+      width: 100%;
+      max-width: 680px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .logo img { width: 32px; height: 32px; }
+    .logo span { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+    input[type=text], input[type=file] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #dde1e7;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 18px;
+    }
+    input[type=text]:focus { border-color: #5b6af7; }
+    .file-area {
+      border: 2px dashed #dde1e7;
+      border-radius: 8px;
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 18px;
+      position: relative;
+    }
+    .file-area:hover, .file-area.drag { border-color: #5b6af7; background: #f0f2ff; }
+    .file-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .file-icon { font-size: 36px; margin-bottom: 8px; }
+    .file-hint { color: #888; font-size: 13px; }
+    .file-name { color: #5b6af7; font-size: 14px; font-weight: 600; margin-top: 6px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: #5b6af7; color: #fff; width: 100%; justify-content: center; }
+    .btn-success { background: #22c55e; color: #fff; width: 100%; justify-content: center; margin-top: 12px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .progress-box {
+      display: none;
+      margin-top: 20px;
+      padding: 18px;
+      background: #f8f9ff;
+      border-radius: 8px;
+      border: 1px solid #e0e4ff;
+    }
+    .progress-bar-wrap {
+      background: #e9ecef;
+      border-radius: 100px;
+      height: 10px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #5b6af7, #818cf8);
+      border-radius: 100px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+    .progress-text { font-size: 13px; color: #555; text-align: center; }
+    .status-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tag-running { background: #e0e4ff; color: #5b6af7; }
+    .tag-done { background: #dcfce7; color: #16a34a; }
+    .tag-error { background: #fee2e2; color: #dc2626; }
+    .tip-box {
+      margin-top: 24px;
+      padding: 14px 16px;
+      background: #fffbeb;
+      border-radius: 8px;
+      border: 1px solid #fde68a;
+      font-size: 13px;
+      color: #92400e;
+      line-height: 1.7;
+    }
+    .tip-box strong { color: #78350f; }
+    hr { border: none; border-top: 1px solid #f0f0f0; margin: 24px 0; }
+    a { color: #5b6af7; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <img src="./favicon.ico" alt="logo"/>
+    <span>MaxKB4j</span>
+  </div>
+  <h1>📊 批量评测</h1>
+  <p class="subtitle">选择智能体，上传测试集，系统自动批量问答并生成评测结果 CSV</p>
+
+  <hr/>
+
+  <label>选择智能体应用</label>
+  <select id="appSelect" style="width:100%;padding:10px 14px;border:1px solid #dde1e7;border-radius:8px;font-size:14px;outline:none;margin-bottom:18px;background:#fff;cursor:pointer;">
+    <option value="">加载中...</option>
+  </select>
+
+  <label>上传测试集文件</label>
+  <div class="file-area" id="fileArea">
+    <input type="file" id="fileInput" accept=".csv,.jsonl,.json,.txt"/>
+    <div class="file-icon">📁</div>
+    <div class="file-hint">点击或拖拽上传文件<br/>支持 CSV / JSONL / TXT</div>
+    <div class="file-name" id="fileName"></div>
+  </div>
+
+  <button class="btn btn-primary" id="submitBtn" onclick="submitTask()">
+    🚀 开始批量评测
+  </button>
+
+  <div class="progress-box" id="progressBox">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span style="font-weight:600;font-size:14px;">评测进度</span>
+      <span class="status-tag tag-running" id="statusTag">处理中</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">0 / 0</div>
+    <button class="btn btn-success" id="downloadBtn" style="display:none" onclick="downloadResult()">
+      ⬇️ 下载评测结果 CSV
+    </button>
+  </div>
+
+  <div class="tip-box">
+    <strong>📋 文件格式说明</strong><br/>
+    • <strong>CSV</strong>：每行一个问题；或包含列头 <code>question</code> / <code>问题</code> / <code>q</code> 的多列文件<br/>
+    • <strong>JSON</strong>：字符串数组格式 <code>["问题1", "问题2", ...]</code><br/>
+    • <strong>TXT</strong>：每行一个问题
+  </div>
+
+  <div style="margin-top:20px;">
+    <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px;">📎 示例文件（点击下载）</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn" style="background:#f0f2ff;color:#5b6af7;padding:8px 16px;font-size:13px;" onclick="downloadSample('json')">⬇ sample.json</button>
+      <button class="btn" style="background:#f0f2ff;color:#5b6af7;padding:8px 16px;font-size:13px;" onclick="downloadSample('csv')">⬇ sample.csv</button>
+      <button class="btn" style="background:#f0f2ff;color:#5b6af7;padding:8px 16px;font-size:13px;" onclick="downloadSample('txt')">⬇ sample.txt</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const BASE = window.MaxKB?.prefix || '/chat';
+  const API = BASE + '/api/batch_eval';
+  let currentTaskId = null;
+  let pollTimer = null;
+
+  // 页面加载时拉取应用列表
+  async function loadApps() {
+    const sel = document.getElementById('appSelect');
+    try {
+      const res = await fetch(API + '/apps');
+      const json = await res.json();
+      if (json.code !== 200 || !json.data?.length) {
+        sel.innerHTML = '<option value="">暂无可用应用，请先在管理后台创建并发布应用</option>';
+        return;
+      }
+      sel.innerHTML = '<option value="">-- 请选择智能体 --</option>' +
+        json.data.map(a => `<option value="${a.accessToken}">${a.name}</option>`).join('');
+    } catch (e) {
+      sel.innerHTML = '<option value="">加载失败，请刷新页面重试</option>';
+    }
+  }
+  loadApps();
+
+  // 文件选择
+  const fileInput = document.getElementById('fileInput');
+  fileInput.addEventListener('change', () => {
+    const f = fileInput.files[0];
+    document.getElementById('fileName').textContent = f ? '✅ ' + f.name : '';
+  });
+
+  // 拖拽
+  const fileArea = document.getElementById('fileArea');
+  fileArea.addEventListener('dragover', e => { e.preventDefault(); fileArea.classList.add('drag'); });
+  fileArea.addEventListener('dragleave', () => fileArea.classList.remove('drag'));
+  fileArea.addEventListener('drop', e => {
+    e.preventDefault();
+    fileArea.classList.remove('drag');
+    if (e.dataTransfer.files.length) {
+      fileInput.files = e.dataTransfer.files;
+      document.getElementById('fileName').textContent = '✅ ' + e.dataTransfer.files[0].name;
+    }
+  });
+
+  async function submitTask() {
+    const token = document.getElementById('appSelect').value;
+    const file = fileInput.files[0];
+    if (!token) { alert('请选择智能体应用'); return; }
+    if (!file) { alert('请选择测试集文件'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ 提交中...';
+
+    const form = new FormData();
+    form.append('accessToken', token);
+    form.append('file', file);
+
+    try {
+      const res = await fetch(API + '/submit', { method: 'POST', body: form });
+      const json = await res.json();
+      if (json.code !== 200) { throw new Error(json.message || '提交失败'); }
+      currentTaskId = json.data.taskId;
+      const total = json.data.total;
+      showProgress(0, total, false);
+      startPolling(total);
+    } catch (e) {
+      alert('提交失败：' + e.message);
+      btn.disabled = false;
+      btn.textContent = '🚀 开始批量评测';
+    }
+  }
+
+  function showProgress(done, total, finished) {
+    const box = document.getElementById('progressBox');
+    box.style.display = 'block';
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = done + ' / ' + total + '（' + pct + '%）';
+    const tag = document.getElementById('statusTag');
+    if (finished) {
+      tag.className = 'status-tag tag-done';
+      tag.textContent = '✅ 已完成';
+      document.getElementById('downloadBtn').style.display = 'flex';
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = false;
+      btn.textContent = '🚀 开始批量评测';
+    } else {
+      tag.className = 'status-tag tag-running';
+      tag.textContent = '⏳ 处理中';
+    }
+  }
+
+  function startPolling(total) {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(async () => {
+      try {
+        const res = await fetch(API + '/' + currentTaskId + '/progress');
+        const json = await res.json();
+        if (json.code !== 200) return;
+        const { done, finished } = json.data;
+        showProgress(done, total, finished);
+        if (finished) clearInterval(pollTimer);
+      } catch (e) { /* ignore */ }
+    }, 1500);
+  }
+
+  function downloadResult() {
+    if (!currentTaskId) return;
+    window.location.href = API + '/' + currentTaskId + '/download';
+  }
+
+  // 下载示例文件
+  const SAMPLES = {
+    json: {
+      name: 'sample_questions.json',
+      mime: 'application/json',
+      content: JSON.stringify([
+        "这个系统主要有哪些功能？",
+        "如何新建一个知识库？",
+        "支持上传哪些格式的文档？",
+        "如何配置大语言模型？",
+        "文档更新后多久生效？"
+      ], null, 2)
+    },
+    csv: {
+      name: 'sample_questions.csv',
+      mime: 'text/csv;charset=utf-8',
+      content: '\uFEFF' + 'question\n这个系统主要有哪些功能？\n如何新建一个知识库？\n支持上传哪些格式的文档？\n如何配置大语言模型？\n文档更新后多久生效？'
+    },
+    txt: {
+      name: 'sample_questions.txt',
+      mime: 'text/plain;charset=utf-8',
+      content: '这个系统主要有哪些功能？\n如何新建一个知识库？\n支持上传哪些格式的文档？\n如何配置大语言模型？\n文档更新后多久生效？'
+    }
+  };
+
+  function downloadSample(type) {
+    const s = SAMPLES[type];
+    const blob = new Blob([s.content], { type: s.mime });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = s.name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+</script>
+</body>
+</html>

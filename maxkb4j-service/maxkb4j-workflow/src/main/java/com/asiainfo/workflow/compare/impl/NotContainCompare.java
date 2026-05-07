@@ -1,0 +1,28 @@
+package com.asiainfo.workflow.compare.impl;
+
+
+import com.asiainfo.workflow.annotation.CompareType;
+import com.asiainfo.workflow.compare.Compare;
+import com.asiainfo.workflow.enums.CompareOperator;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+@CompareType(CompareOperator.NOT_CONTAIN)
+public class NotContainCompare implements Compare {
+
+    @Override
+    public boolean compare(Object sourceValue, Object targetValue) {
+        if (sourceValue == null) {
+            return true;
+        }
+        if (sourceValue instanceof List<?>) {
+            return !((List<?>) sourceValue).contains(targetValue);
+        }
+        if (sourceValue instanceof String && targetValue instanceof String) {
+            return !((String) sourceValue).contains((String) targetValue);
+        }
+        return true;
+    }
+}

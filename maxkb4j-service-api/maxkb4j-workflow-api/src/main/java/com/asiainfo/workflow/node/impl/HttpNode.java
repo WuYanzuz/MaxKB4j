@@ -1,0 +1,46 @@
+package com.asiainfo.workflow.node.impl;
+
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.asiainfo.workflow.model.Workflow;
+import com.asiainfo.workflow.node.AbsNode;
+import lombok.Data;
+
+import java.util.Map;
+
+import static com.asiainfo.workflow.enums.NodeType.HTTP_CLIENT;
+
+
+public class HttpNode extends AbsNode {
+
+
+    public HttpNode(String id,JSONObject properties) {
+        super(id,properties);
+        super.setType(HTTP_CLIENT.getKey());
+    }
+
+
+    @Override
+    public void saveContext(Workflow workflow, Map<String, Object> detail) {
+        context.put("status",detail.get("status"));
+        context.put("body",detail.get("body"));
+    }
+
+    @Data
+    public static class NodeParams {
+        private String url;
+        private String method;
+        private String body;
+        private JSONArray headers;
+        private JSONArray params;
+        private Integer timeout;
+        private String authType;
+        private String username;
+        private String password;
+        private String token;
+    }
+
+
+}
+

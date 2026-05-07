@@ -1,0 +1,12 @@
+package com.asiainfo.common.exception;
+
+public class AccessNumLimitException extends RuntimeException {
+
+    public AccessNumLimitException() {
+        super();
+    }
+
+    public AccessNumLimitException(String message) {
+        super(message);
+    }
+}

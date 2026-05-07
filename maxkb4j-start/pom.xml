@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.tarzan</groupId>
+        <groupId>com.asiainfo</groupId>
         <artifactId>MaxKB4j</artifactId>
         <version>${revision}</version>
     </parent>
@@ -21,47 +21,47 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-application</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-knowledge</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-system</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-tool</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-chat</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-model</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-oss</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-workflow</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-trigger</artifactId>
             <version>${revision}</version>
         </dependency>

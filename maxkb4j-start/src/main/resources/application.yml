@@ -32,8 +32,8 @@ mybatis-plus:
       table-format: "\"%s\""
       column-format:  "\"%s\""
   mapper-locations: classpath:mapper/**/*.xml,mapper/*.xml
-  type-aliases-package: com.maxkb4j.**.entity
-  type-handlers-package: com.maxkb4j.common.typehandler
+  type-aliases-package: com.asiainfo.**.entity
+  type-handlers-package: com.asiainfo.common.typehandler
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
   # jwt秘钥 - 使用环境变量配置

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.tarzan</groupId>
+        <groupId>com.asiainfo</groupId>
         <artifactId>maxkb4j-service-api</artifactId>
         <version>${revision}</version>
     </parent>
@@ -19,12 +19,12 @@
             <artifactId>langchain4j-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-application-api</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.tarzan</groupId>
+            <groupId>com.asiainfo</groupId>
             <artifactId>maxkb4j-tool-api</artifactId>
             <version>${revision}</version>
         </dependency>

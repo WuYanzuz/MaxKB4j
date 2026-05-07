@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/MaxKB4J_v2
-    username: username
-    password: password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/MaxKB4j}
+    username: ${SPRING_DATASOURCE_USERNAME:tarzan_postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:ycn4NRhjN2}
     driver-class-name: org.postgresql.Driver
   data:
     mongodb:
-      uri: mongodb://tarzan_mongo:ycn4NRhjN2@localhost:27017/MaxKB4J?authSource=admin
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://tarzan_mongo:ycn4NRhjN2@mongo:27017/MaxKB4j?authSource=admin}

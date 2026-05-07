@@ -1,0 +1,69 @@
+package com.asiainfo.workflow.handler.node.impl;
+
+import com.asiainfo.common.domain.dto.OssFile;
+import com.asiainfo.knowledge.dto.DocumentSimple;
+import com.asiainfo.knowledge.service.IDocumentParseService;
+import com.asiainfo.oss.service.IOssService;
+import com.asiainfo.workflow.annotation.NodeHandlerType;
+import com.asiainfo.workflow.enums.NodeType;
+import com.asiainfo.workflow.handler.node.AbsNodeHandler;
+import com.asiainfo.workflow.model.NodeResult;
+import com.asiainfo.workflow.model.Workflow;
+import com.asiainfo.workflow.node.AbsNode;
+import com.asiainfo.workflow.node.impl.DocumentExtractNode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.io.InputStream;
+import java.util.*;
+
+@NodeHandlerType(NodeType.DOCUMENT_EXTRACT)
+@RequiredArgsConstructor
+@Component
+public class DocumentExtractNodeHandler extends AbsNodeHandler {
+
+    private final IDocumentParseService documentParseService;
+    private final IOssService fileService;
+
+    @Override
+    protected NodeResult doExecute(Workflow workflow, AbsNode node) throws Exception {
+        DocumentExtractNode.NodeParams params = parseParams(node, DocumentExtractNode.NodeParams.class);
+        // 安全校验 documentList
+        if (params == null || params.getDocumentList() == null || params.getDocumentList().size() < 2) {
+            throw new IllegalArgumentException("Invalid documentList in node params: expected at least two elements");
+        }
+
+        // 获取引用字段（workflow 中的文档列表）
+        Object res = workflow.getReferenceField(params.getDocumentList());
+        List<OssFile> documentFiles;
+
+        if (res == null) {
+            documentFiles = Collections.emptyList();
+        } else if (res instanceof List<?>) {
+            documentFiles = new ArrayList<>();
+            for (Object item : (List<?>) res) {
+                if (item instanceof OssFile) {
+                    documentFiles.add((OssFile) item);
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Expected List<SysFile> from reference field, but got: " + res.getClass());
+        }
+
+        // 处理文档
+        List<String> contentList = new LinkedList<>();
+        List<DocumentSimple> documentList = new ArrayList<>();
+
+        for (OssFile sysFile : documentFiles) {
+            InputStream ins = fileService.getStream(sysFile.getFileId());
+            String text = documentParseService.extractText(sysFile.getName(), ins);
+            contentList.add(text);
+            documentList.add(new DocumentSimple(sysFile.getName(), text, sysFile.getFileId()));
+        }
+
+        return new NodeResult(Map.of(
+                "content", String.join(DocumentExtractNode.SPLITTER, contentList),
+                "documentList", documentList
+        ));
+    }
+}

@@ -1,0 +1,15 @@
+package com.asiainfo.tool.vo;
+
+import com.asiainfo.common.domain.dto.OssFile;
+import com.asiainfo.tool.entity.ToolEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.List;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class ToolVO extends ToolEntity {
+    private String nickname;
+    private List<OssFile> fileList;
+}

@@ -1,0 +1,45 @@
+package com.asiainfo.workflow.handler.node.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.asiainfo.common.util.ObjectUtil;
+import com.asiainfo.workflow.annotation.NodeHandlerType;
+import com.asiainfo.workflow.enums.NodeType;
+import com.asiainfo.workflow.handler.node.AbsNodeHandler;
+import com.asiainfo.workflow.model.NodeResult;
+import com.asiainfo.workflow.model.Workflow;
+import com.asiainfo.workflow.node.AbsNode;
+import com.asiainfo.workflow.node.impl.DirectReplyNode;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+@NodeHandlerType(NodeType.REPLY)
+@Component
+public class DirectReplyNodeHandler extends AbsNodeHandler {
+
+
+    @Override
+    protected NodeResult doExecute(Workflow workflow, AbsNode node) throws Exception {
+        DirectReplyNode.NodeParams params = parseParams(node, DirectReplyNode.NodeParams.class);
+        AtomicReference<String> answerText = new AtomicReference<>("");
+        if ("referencing".equals(params.getReplyType())) {
+            List<String> fields = params.getFields();
+            Object value = workflow.getReferenceField(fields);
+            if (value == null) {
+                answerText.set("None");
+            } else if (ObjectUtil.isSimpleType(value)) {
+                answerText.set(value.toString());
+            } else {
+                answerText.set(JSON.toJSONString(value));
+            }
+        } else {
+            answerText.set(workflow.renderPrompt(params.getContent()));
+        }
+        if (params.getIsResult()) {
+            setAnswer(node, answerText.get());
+        }
+        return new NodeResult(Map.of("answer", answerText.get()));
+    }
+}

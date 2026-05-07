@@ -8,7 +8,7 @@
         <version>3.5.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.tarzan</groupId>
+    <groupId>com.asiainfo</groupId>
     <artifactId>MaxKB4j</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -577,6 +577,13 @@
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
